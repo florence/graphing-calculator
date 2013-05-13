@@ -11,6 +11,6 @@
 (define (free-vars x)
   (cond [(and (symbol? x) (= 1 (string-length (symbol->string x))))
                  (list x)]
-        [(list? x) (append-map free-vars (free-vars x))]
+        [(list? x) (append-map free-vars x)]
         [else null]))
   
