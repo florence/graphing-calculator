@@ -6,7 +6,7 @@
 
 (define (graph2d str min max)
   (define expr (parse-string str))
-  (define vars (free-vars expr))
+  (define vars (let ([f (free-vars expr)]) (if (null? f) '(_) (list (first f)))))
   (plot (list (function (evaluate `(λ ,vars ,expr)) min max #:label str)
               (axes))))
 
