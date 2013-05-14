@@ -8,10 +8,10 @@
                    '(define arcsin asin)
                    '(define arccos acos)))
 
-(define (graph2d str min max)
+(define (graph2d str min max [invert? #f])
   (define expr (parse-string str))
   (define vars (let ([f (free-vars expr)]) (if (null? f) '(_) (list (first f)))))
-  (plot (list (function (evaluate `(λ ,vars ,expr)) min max #:label str)
+  (plot (list ((if invert? inverse function) (evaluate `(λ ,vars ,expr)) min max #:label str)
               (axes))))
 
 (define (free-vars x)

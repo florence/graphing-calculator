@@ -8,6 +8,10 @@
 (define function (new text-field% [label "function"] [parent frame]))
 (define min (new text-field% [label "min"] [parent frame] [init-value "-10"]))
 (define max (new text-field% [label "max"] [parent frame] [init-value "10"]))
+(define inverse?
+  (new check-box%	 
+       [label "invert?"]	 
+       [parent frame]))
 
 (define go!
   (new button% [parent frame]
@@ -16,7 +20,8 @@
                    (with-handlers ([exn:fail? show-error-dialog])
                      (graph2d (send function get-value)
                               (string->number (send min get-value))
-                              (string->number (send max get-value)))))]))
+                              (string->number (send max get-value))
+                              (send inverse? get-value))))]))
 
 (define (show-error-dialog e)
   ; Create a dialog
