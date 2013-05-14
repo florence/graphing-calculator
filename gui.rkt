@@ -1,12 +1,12 @@
 #lang racket/gui
 (require "graph.rkt" (only-in plot plot-new-window?))
-(plot-new-window? #t)
+(plot-new-window? #t) ;; fucking hack. couldn't get it embeded in a gui, and this lets multiple graphs be up at once
 
 (define frame
   (new frame% [label "A Basic Calculator"]))
 
 (define function (new text-field% [label "function"] [parent frame]))
-(define min (new text-field% [label "min"] [parent frame] [init-value "0"]))
+(define min (new text-field% [label "min"] [parent frame] [init-value "-10"]))
 (define max (new text-field% [label "max"] [parent frame] [init-value "10"]))
 
 (define go!
