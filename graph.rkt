@@ -1,5 +1,6 @@
 #lang racket
 (require "parser.rkt" racket/sandbox plot)
+(provide graph2d)
 
 (define evaluate (make-evaluator 'racket/base))
 
@@ -9,8 +10,9 @@
   (plot (function (evaluate `(λ ,vars ,expr)) min max #:label str)))
 
 (define (free-vars x)
-  (cond [(and (symbol? x) (= 1 (string-length (symbol->string x))))
-                 (list x)]
-        [(list? x) (append-map free-vars x)]
-        [else null]))
+  (remove-duplicates
+   (cond [(and (symbol? x) (= 1 (string-length (symbol->string x))))
+          (list x)]
+         [(list? x) (append-map free-vars (rest x))]
+         [else null])))
   
