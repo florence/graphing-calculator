@@ -2,7 +2,11 @@
 (require "parser.rkt" racket/sandbox plot)
 (provide graph2d)
 
-(define evaluate (make-evaluator 'racket/base '(define ^ expt)))
+(define evaluate (make-evaluator 'racket/base 
+                   '(define ^ expt)
+                   '(define arctan atan)
+                   '(define arcsin asin)
+                   '(define arccos acos)))
 
 (define (graph2d str min max)
   (define expr (parse-string str))
@@ -16,4 +20,3 @@
           (list x)]
          [(list? x) (append-map free-vars (rest x))]
          [else null])))
-  
