@@ -2,7 +2,7 @@
 (require "parser.rkt" racket/sandbox plot)
 (provide graph2d)
 
-(define evaluate (make-evaluator 'racket/base))
+(define evaluate (make-evaluator 'racket/base '(define ^ expt)))
 
 (define (graph2d str min max)
   (define expr (parse-string str))
