@@ -5,7 +5,7 @@
 (define frame
   (new frame% [label "A Basic Calculator"]))
 
-(define function (new text-field% [label "function"] [parent frame]))
+(define function (new text-field% [label "f(x)"] [parent frame]))
 (define min (new text-field% [label "min"] [parent frame] [init-value "-10"]))
 (define max (new text-field% [label "max"] [parent frame] [init-value "10"]))
 (define inverse?

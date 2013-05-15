@@ -11,5 +11,7 @@
 
 (define (graph2d str min max [invert? #f])
   (define expr (parse-string str))
-  (plot (list ((if invert? inverse function) (evaluate `(λ (x) ,expr)) min max #:label str)
+  (plot (list ((if invert? inverse function) 
+               (evaluate `(λ (x) ,expr))
+               min max #:label str)
               (axes))))
