@@ -6,17 +6,10 @@
                    '(define ^ expt)
                    '(define arctan atan)
                    '(define arcsin asin)
-                   '(define arccos acos)))
+                   '(define arccos acos)
+                   '(define e #i2.718281828459045)))
 
 (define (graph2d str min max [invert? #f])
   (define expr (parse-string str))
-  (define vars (let ([f (free-vars expr)]) (if (null? f) '(_) (list (first f)))))
-  (plot (list ((if invert? inverse function) (evaluate `(λ ,vars ,expr)) min max #:label str)
+  (plot (list ((if invert? inverse function) (evaluate `(λ (x) ,expr)) min max #:label str)
               (axes))))
-
-(define (free-vars x)
-  (remove-duplicates
-   (cond [(and (symbol? x) (= 1 (string-length (symbol->string x))))
-          (list x)]
-         [(list? x) (append-map free-vars (rest x))]
-         [else null])))
