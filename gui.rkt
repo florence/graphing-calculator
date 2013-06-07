@@ -1,7 +1,5 @@
 #lang racket/gui
 (require "graph.rkt" (only-in plot plot-new-window?))
-;; (plot-new-window? #t) ;; fucking hack. couldn't get it embeded in a gui, and this lets multiple graphs be up at once
-
 
 (define (show)
   ;; main frame
@@ -17,7 +15,14 @@
          [parent frame]))
   ;; rendering
   (define paste  (new pasteboard%))
-  (define canvas (new editor-canvas% [parent frame] [editor paste]))
+  (define canvas (new editor-canvas%
+                      [parent frame]
+                      [editor paste]
+                      [min-width 430]	 
+                      [min-height 420]	 
+                      [stretchable-width #f]	 
+                      [stretchable-height #f]
+                      [style '(no-hscroll no-vscroll)]))
   (define (render pic)
     (send paste begin-edit-sequence)
     (send paste select-all)
@@ -60,4 +65,3 @@
   
   ; Show the dialog
   (send dialog show #t))
-

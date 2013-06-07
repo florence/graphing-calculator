@@ -90,4 +90,6 @@ Number:   Same as racket
   (test "3+5" '(+ 3 5))
   (test "3-x" '(- 3 x))
   (test "(3- x)" '(- 3 x))
+  (test "3^2" '(^ 3 2))
+  (test "3^2/2" '(/ (^ 3 2) 2))
   (test "(3-x)+(sin(4) + 6)" '(+ (- 3 x) (+ (sin 4) 6))))
