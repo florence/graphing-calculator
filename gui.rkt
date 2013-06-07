@@ -1,28 +1,46 @@
 #lang racket/gui
 (require "graph.rkt" (only-in plot plot-new-window?))
-(plot-new-window? #t) ;; fucking hack. couldn't get it embeded in a gui, and this lets multiple graphs be up at once
+;; (plot-new-window? #t) ;; fucking hack. couldn't get it embeded in a gui, and this lets multiple graphs be up at once
 
-(define frame
-  (new frame% [label "A Basic Calculator"]))
 
-(define function (new text-field% [label "f(x)"] [parent frame]))
-(define min (new text-field% [label "min"] [parent frame] [init-value "-10"]))
-(define max (new text-field% [label "max"] [parent frame] [init-value "10"]))
-(define inverse?
-  (new check-box%	 
-       [label "invert?"]	 
-       [parent frame]))
-
-(define go!
-  (new button% [parent frame]
-       [label "Graph It!"]
-       [callback (lambda (button event)
-                   (with-handlers ([exn:fail? show-error-dialog])
-                     (graph2d (send function get-value)
-                              (string->number (send min get-value))
-                              (string->number (send max get-value))
-                              (send inverse? get-value))))]))
-
+(define (show)
+  ;; main frame
+  (define frame
+    (new frame% [label "A Basic Calculator"]))
+  ;; input fields
+  (define function (new text-field% [label "f(x) = "] [parent frame]))
+  (define min (new text-field% [label "min"] [parent frame] [init-value "-10"]))
+  (define max (new text-field% [label "max"] [parent frame] [init-value "10"]))
+  (define inverse?
+    (new check-box%	 
+         [label "invert?"]	 
+         [parent frame]))
+  ;; rendering
+  (define paste  (new pasteboard%))
+  (define canvas (new editor-canvas% [parent frame] [editor paste]))
+  (define (render pic)
+    (send paste begin-edit-sequence)
+    (send paste select-all)
+    (send paste clear)
+    (send paste insert pic 0 0)
+    (send paste end-edit-sequence))
+  ;; the button
+  (define go!
+    (new button% [parent frame]
+         [label "Graph It!"]
+         [callback 
+          (lambda (button event)
+            (with-handlers ([exn:fail? show-error-dialog])
+              (render
+               (graph2d (send function get-value)
+                        (string->number (send min get-value))
+                        (string->number (send max get-value))
+                        (send inverse? get-value)))))]))
+  ;; go
+  (send frame show #t))
+  
+;; -> (Nat Board -> Void)
+;; display current state in a canvas
 (define (show-error-dialog e)
   ; Create a dialog
   (define dialog (instantiate dialog% ("Error")))
@@ -42,7 +60,4 @@
   
   ; Show the dialog
   (send dialog show #t))
-
-          
-(send frame show #t)
 
