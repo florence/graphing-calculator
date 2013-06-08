@@ -42,7 +42,9 @@ Number:   Same as racket
   (lexer
    [(eof) (token-END)]
    [(:or #\tab #\space) (cal-lexer input-port)]
-   [(:: (:+ digit) (:? (:: "." (:+ digit)))) (token-NUM (string->number lexeme))]
+   [(:or (:: (:+ digit) (:? (:: "." (:+ digit))))
+         (:: "." (:+ digit)))
+    (token-NUM (string->number lexeme))]
    [operator (token-OPERATOR (string->symbol lexeme))] 
    ["(" 'OP]
    [")" 'CP]
@@ -92,4 +94,6 @@ Number:   Same as racket
   (test "(3- x)" '(- 3 x))
   (test "3^2" '(^ 3 2))
   (test "3^2/2" '(/ (^ 3 2) 2))
+  (test ".1" .1)
+  (test "+x" '(+ x))
   (test "(3-x)+(sin(4) + 6)" '(+ (- 3 x) (+ (sin 4) 6))))
