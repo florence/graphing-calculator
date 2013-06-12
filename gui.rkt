@@ -6,27 +6,7 @@
   (define frame
     (new frame% [label "A Basic Calculator"]))
   ;; input fields
-  (define container (new pane% [parent frame]))
-  (define (fields* . str) 
-    (call-with-values (λ () (apply function-fields container str)) list))
-  
-  (define choices
-    (hash "normal" (cons graph2d (fields* "f(x) = "))
-          "parametric" (cons parametric2d (fields* "x(t) = " "y(t) = "))
-          "polar" (cons polar2d (fields* "r(t) = "))))
-  (define get (third (hash-ref choices "normal")))
-  (define graph (first (hash-ref choices "normal")))
-  (define chooser
-    (let ([d (second (hash-ref choices "normal"))])
-      (new choice% [parent frame] [label "function type"] [choices (hash-keys choices)]
-           [callback (λ (c _)
-                       (define-values (grapher e getter) (apply values (hash-ref choices (send c get-string-selection))))
-                       (d #f)
-                       (e #t)
-                       (set! d e)
-                       (set! get getter)
-                       (set! graph grapher))])))
-  (send chooser set-selection 1)
+  (define-values (get graph) (make-grapher frame))
   (define min (new text-field% [label "min"] [parent frame] [init-value "-10"]))
   (define max (new text-field% [label "max"] [parent frame] [init-value "10"]))
   (define inverse?
@@ -34,21 +14,7 @@
          [label "invert?"]	 
          [parent frame]))
   ;; rendering
-  (define paste  (new pasteboard%))
-  (define canvas (new editor-canvas%
-                      [parent frame]
-                      [editor paste]
-                      [min-width 430]	 
-                      [min-height 420]	 
-                      [stretchable-width #f]	 
-                      [stretchable-height #f]
-                      [style '(no-hscroll no-vscroll)]))
-  (define (render pic)
-    (send paste begin-edit-sequence)
-    (send paste select-all)
-    (send paste clear)
-    (send paste insert pic 0 0)
-    (send paste end-edit-sequence))
+  (define render (make-renderer frame))
   ;; the button
   (define go!
     (new button% [parent frame]
@@ -63,8 +29,35 @@
                       (send inverse? get-value)
                       (get)))))]))
   ;; go
-  ((second (hash-ref choices "normal")) #t)
   (send frame show #t))
+
+;; parentable -> grapher (-> string)
+(define (make-grapher parent)
+  (define (fields* . str) 
+    (call-with-values (λ () (apply function-fields container str)) list))
+  
+  (define container (new pane% [parent parent]))
+  (define choices
+    (hash "normal" (cons graph2d (fields* "f(x) = "))
+          "parametric" (cons parametric2d (fields* "x(t) = " "y(t) = "))
+          "polar" (cons polar2d (fields* "r(t) = "))))
+  
+  (define getb (box void))
+  (define graphb (box void))
+  (define deactiveb (box void))
+  (define (update-to! s)
+    (define-values (grapher e getter) (apply values (hash-ref choices s)))
+    ((unbox deactiveb) #f)
+    (e #t)
+    (set-box! deactiveb e)
+    (set-box! getb getter)
+    (set-box! graphb grapher))
+  
+  (define chooser
+    (new choice% [parent parent] [label "function type"] [choices (hash-keys choices)]
+         [callback (λ (c _) (update-to! (send c get-string-selection)))]))
+  (update-to! (send chooser get-string-selection))
+  (values (λ _ (apply (unbox getb) _)) (λ _ (apply (unbox graphb) _))))
 
 ;; parentable string... -> (bool ->) (-> (listof strings))
 (define (function-fields parent . names)
@@ -73,6 +66,24 @@
   (values
    (λ (?) (if ? (send parent add-child p) (send parent delete-child p)))
    (λ () (map (λ (f) (send f get-value)) functions))))
+
+;; parentable -> (image-snip% ->)
+(define (make-renderer parent)
+  (define paste  (new pasteboard%))
+  (define canvas (new editor-canvas%
+                      [parent parent]
+                      [editor paste]
+                      [min-width 430]	 
+                      [min-height 420]	 
+                      [stretchable-width #f]	 
+                      [stretchable-height #f]
+                      [style '(no-hscroll no-vscroll)]))
+  (λ (pic)
+    (send paste begin-edit-sequence)
+    (send paste select-all)
+    (send paste clear)
+    (send paste insert pic 0 0)
+    (send paste end-edit-sequence)))
   
 ;; -> (Nat Board -> Void)
 ;; display current state in a canvas
