@@ -95,7 +95,7 @@
   (define dialog (instantiate dialog% ("Error")))
   
   ; Add a text field to the dialog
-  (new message% [parent dialog] [label (~a (exn-message e))])
+  (new message% [parent dialog] [label (string-replace (~a (exn-message e)) "\n" " ")])
   
   ; Add a horizontal panel to the dialog, with centering for buttons
   (define panel (new horizontal-panel% [parent dialog]
