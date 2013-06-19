@@ -1,6 +1,17 @@
 #lang racket
-(require "parser.rkt" racket/sandbox plot)
-(provide graph2d parametric2d polar2d)
+(require "parser.rkt" racket/sandbox plot (only-in racket/snip image-snip%))
+(provide 
+ (contract-out
+  [graph2d (grapher/c 1)]
+  [parametric2d (grapher/c 2)]
+  [polar2d (grapher/c 1)]))
+
+(define (grapher/c l)
+  (->i ([min real?] [max real?] [invert? boolean?])
+       #:rest [strs (listof string?)]
+       #:pre/name (strs) "wrong number of functions given" (= (length strs) l)
+       #:pre/name (min max) "min and max out of range" (> max min)
+       [_ (is-a?/c image-snip%)]))
 
 (define evaluate (make-evaluator 'racket/base 
                    '(define ^ expt)
@@ -13,6 +24,8 @@
                    '(define phi #i1.61803398875)
                    '(define g   #i9.81)
                    ;; the - prevents the input from calling it
+                   ;; -guard helps when graphing functions that approach inifinity,
+                   ;; in graph modes that expect only reals
                    '(define (-guard v) (if (real? v) v +nan.0))))
 
 (define ((grapher builder normal inverse) min max invert? . str)
