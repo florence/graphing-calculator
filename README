@@ -1,3 +1,4 @@
 A graphing calculator written in racket
 
-To run, execute 'racket -tm gui.rkt'
+run 'make' to build an executable for your system. 
+'make run' will execute without creating an executable.
