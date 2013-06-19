@@ -1,1 +1,3 @@
 A graphing calculator written in racket
+
+To run, execute 'racket -tm gui.rkt'

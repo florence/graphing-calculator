@@ -1,6 +1,9 @@
 #lang racket/gui
 (require "graph.rkt" (only-in plot plot-new-window?))
 
+(provide main)
+(define (main) (show))
+
 (define (show)
   ;; main frame
   (define frame
