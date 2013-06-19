@@ -33,9 +33,9 @@ Number:   Same as racket
 
 (define-lex-abbrevs
   (letter (:/ "a" "z"))
-  (operator (:or "-" "+" "^" "*" "/"))
+  (operator (:or "-" "+" "^" "*" "/" "E"))
   (digit (:/ "0" "9")))
-(define-tokens values (NUM VAR FUNC OPERATOR))
+(define-tokens values (NUM ENV OPERATOR))
 (define-empty-tokens prog (OP CP END COMMA))
 
 (define cal-lexer
@@ -49,8 +49,7 @@ Number:   Same as racket
    ["(" 'OP]
    [")" 'CP]
    ["," 'COMMA]
-   [letter (token-VAR (string->symbol lexeme))]
-   [(:: letter (:+ letter)) (token-FUNC (string->symbol lexeme))]))
+   [(:: letter (:? (:+ letter))) (token-ENV (string->symbol lexeme))]))
 
 (define cal-parser
   (parser
@@ -59,20 +58,20 @@ Number:   Same as racket
    (error (lambda args (map displayln args) (error 'parse "bad syntax")))
    (start expr)
    (precs
+    (right ENV)
     (left OPERATOR)
     (left OP CP))
    (grammar
     (expr
      [(NUM) $1]
-     [(VAR) $1]
-     [(NUM VAR) `(* ,$1 ,$2)]
+     [(NUM environment) `(* ,$1 ,$2)]
      [(expr OPERATOR expr) `(,$2 ,$1 ,$3)]
-     [(function) $1]
-     [(NUM function) `(* ,$1 ,$2)]
+     [(environment) $1]
      [(expr OP expr CP) `(* ,$1 ,$3)]
      [(OP expr CP) $2]
      [(OPERATOR expr) `(,$1 ,$2)])
-    (function [(FUNC OP args-list CP) `(,$1 ,@$3)])
+    (environment [(ENV OP args-list CP) `(,$1 ,@$3)]
+                 [(ENV) $1])
     (args-list
      [(expr) (list $1)]
      [(expr COMMA args-list) (cons $1 $3)]))))
@@ -87,6 +86,8 @@ Number:   Same as racket
   (test "garbage(y,2)" '(garbage y 2))
   (test "4(3)" '(* 4 3))
   (test "4sin(x)" '(* 4 (sin x)))
+  (test "pi" 'pi)
+  (test "xy" 'xy)
   (test "-2" '(- 2))
   (test "sin(-9)" '(sin (- 9)))
   (test "3+5" '(+ 3 5))
@@ -96,4 +97,6 @@ Number:   Same as racket
   (test "3^2/2" '(/ (^ 3 2) 2))
   (test ".1" .1)
   (test "+x" '(+ x))
-  (test "(3-x)+(sin(4) + 6)" '(+ (- 3 x) (+ (sin 4) 6))))
+  (test "(3-x)+(sin(4) + 6)" '(+ (- 3 x) (+ (sin 4) 6)))
+  (test "4E9" '(E 4 9))
+  (test "6E(1+2)" '(E 6 (+ 1 2))))

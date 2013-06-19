@@ -7,7 +7,12 @@
                    '(define arctan atan)
                    '(define arcsin asin)
                    '(define arccos acos)
-                   '(define e #i2.718281828459045)
+                   '(define (E number exp) (* number (^ 10 exp)))
+                   '(define e   #i2.718281828459045)
+                   '(define pi  #i3.14159)
+                   '(define phi #i1.61803398875)
+                   '(define g   #i9.81)
+                   ;; the - prevents the input from calling it
                    '(define (-guard v) (if (real? v) v +nan.0))))
 
 (define ((grapher builder normal inverse) min max invert? . str)
