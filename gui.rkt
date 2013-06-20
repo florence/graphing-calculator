@@ -44,7 +44,6 @@
     (for/hash ([n choices-names] [f choices-functions] [l choices-labels])
       (values n (cons f (apply fields* l)))))
   
-  (define get void)
   (define graph void)
   (define deactive void)
   (define (update-to! s)
@@ -52,8 +51,7 @@
     (deactive)
     (activate)
     (set! deactive activate)
-    (set! get getter)
-    (set! graph grapher))
+    (set! graph (λ (min max inv?) (apply grapher min max inv? (getter)))))
   
   (define chooser
     (new choice% [parent parent] [label "function type"] [choices choices-names]
@@ -62,11 +60,9 @@
   (update-to! (send chooser get-string-selection))
   
   (λ ()
-    (apply graph
-           (string->number (send min get-value))
+    (graph (string->number (send min get-value))
            (string->number (send max get-value))
-           (send inverse? get-value)
-           (get))))
+           (send inverse? get-value))))
 
 ;; parentable string... -> (->) (-> (listof strings))
 ;; add one text field to the parent for each name (using the given name as the label)
