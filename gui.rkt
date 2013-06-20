@@ -101,12 +101,13 @@
                       [stretchable-width #f]	 
                       [stretchable-height #f]
                       [style '(no-hscroll no-vscroll)]))
-  (λ (pic)
+  (define old #f)
+  (λ (new)
     (send paste begin-edit-sequence)
-    (send paste select-all)
-    (send paste clear)
-    (send paste insert pic 0 0)
-    (send paste end-edit-sequence)))
+    (when old (send paste delete old))
+    (send paste insert new 0 0)
+    (send paste end-edit-sequence)
+    (set! old new)))
   
 ;; -> (Nat Board -> Void)
 ;; display current state in a canvas
