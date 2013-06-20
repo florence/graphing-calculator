@@ -9,24 +9,6 @@
 
 (provide parse-string)
 
-#|
-Accepted Grammar:
-
-Expression := <Variable>
-            | <Number>
-            | <Number><Variable>
-            | <Expression><Operator><Expression>
-            | <Function>(<Expression,...)
-            | <Number><Function>(<Expression,...)
-            | <Expression>(Expression)
-            | <Single><Expression>
-
-Variable: <Alpha>
-Operator: <Alpha>...+
-Single:   + | -
-Number:   Same as racket
-|#
-
 (define (parse-string s)
   (define p (open-input-string s))
   (cal-parser (λ () (cal-lexer p))))
