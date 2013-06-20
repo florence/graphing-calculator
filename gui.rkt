@@ -11,8 +11,6 @@
   (define frame (new frame% [label "A Basic Calculator"]))
   ;; input fields
   (define graph (make-grapher frame))
-  ;; rendering
-  (define render (make-renderer frame))
   ;; the button
   (define go!
     (new button% [parent frame]
@@ -21,6 +19,8 @@
           (lambda (button event)
             (with-handlers ([exn:fail? show-error-dialog])
               (render (graph))))]))
+  ;; rendering
+  (define render (make-renderer frame))
   ;; go
   (send frame show #t))
 
