@@ -7,20 +7,27 @@
 ;; -> Void
 ;; Show a new graphing calculator 
 (define (show)
+  (define (graph! . _)
+    (with-handlers ([exn:fail? show-error-dialog])
+      (render! (graph))))
   ;; main frame
-  (define frame (new frame% [label "A Basic Calculator"]))
+  (define frame (new 
+                 (class frame% 
+                   (super-new)
+                   (define/override (on-traverse-char e)
+                     (and (equal? (send e get-key-code) #\return)
+                          (graph!)
+                          #t)))
+                 [label "A Basic Calculator"]))
   ;; input fields
-  (define graph (make-grapher frame))
+  (define graph (make-grapher! frame))
   ;; the button
   (define go!
     (new button% [parent frame]
          [label "Graph It!"]
-         [callback 
-          (lambda (button event)
-            (with-handlers ([exn:fail? show-error-dialog])
-              (render (graph))))]))
+         [callback graph!]))
   ;; rendering
-  (define render (make-renderer frame))
+  (define render! (make-renderer! frame))
   ;; go
   (send frame show #t))
 
@@ -29,16 +36,16 @@
 (define choices-labels '(("f(x) = ") ("x(t) = " "y(t) = ") ("r(t) = ")))
 
 ;; parentable -> (-> image-snip%)
-;; take a parent object attached the fields needed for getting user input
+;; EFFECT: take a parent object attached the fields needed for getting user input
 ;; and return a function for generating an image-snip% from user input
-(define (make-grapher parent)
+(define (make-grapher! parent)
   (define container (new pane% [parent parent]))
   (define min (new text-field% [label "min"] [parent parent] [init-value "-10"]))
   (define max (new text-field% [label "max"] [parent parent] [init-value "10"]))
   (define inverse? (new check-box% [label "invert?"] [parent parent]))
   
   (define (fields* . strs) 
-    (call-with-values (λ () (apply function-fields container strs)) list))
+    (call-with-values (λ () (apply function-fields! container strs)) list))
   
   (define choices-map
     (for/hash ([n choices-names] [f choices-functions] [l choices-labels])
@@ -65,10 +72,10 @@
            (send inverse? get-value))))
 
 ;; parentable string... -> (->) (-> (listof strings))
-;; add one text field to the parent for each name (using the given name as the label)
+;; EFFECT: add one text field to the parent for each name (using the given name as the label)
 ;; the fields are hidden
 ;; return a function to show/hide the fields and a function to get values from all of them
-(define (function-fields parent . names)
+(define (function-fields! parent . names)
   (define p (new horizontal-panel% [parent parent] [style '(deleted)]))
   (define functions (for/list ([name names]) (new text-field% [label name] [parent p])))
   (values
@@ -78,9 +85,9 @@
    (λ () (map (λ (f) (send f get-value)) functions))))
 
 ;; parentable -> (image-snip% ->)
-;; add a canvas to the parent
+;; EFFECT: add a canvas to the parent
 ;; return a function that will render an image-snip% to the canvas
-(define (make-renderer parent)
+(define (make-renderer! parent)
   (define paste (new (class pasteboard%
                        (super-new)
                        (define/augment (can-interactive-move? e) #f)
