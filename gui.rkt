@@ -81,7 +81,9 @@
 ;; add a canvas to the parent
 ;; return a function that will render an image-snip% to the canvas
 (define (make-renderer parent)
-  (define paste  (new pasteboard%))
+  (define paste  (new (class pasteboard%
+                        (super-new)
+                        (define/augment (can-interactive-move? e) #f))))
   (define canvas (new editor-canvas%
                       [parent parent]
                       [editor paste]
