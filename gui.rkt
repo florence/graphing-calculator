@@ -96,8 +96,8 @@
   (define canvas (new editor-canvas%
                       [parent parent]
                       [editor paste]
-                      [min-width 430]	 
-                      [min-height 420]	 
+                      [min-width 420]	 
+                      [min-height 400]	 
                       [stretchable-width #f]	 
                       [stretchable-height #f]
                       [style '(no-hscroll no-vscroll)]))
