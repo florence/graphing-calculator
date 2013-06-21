@@ -81,4 +81,5 @@
   (test "+x" '(+ x))
   (test "(3-x)+(sin(4) + 6)" '(+ (- 3 x) (+ (sin 4) 6)))
   (test "4E9" '(E 4 9))
+  (test "x(y)" '(x y)) ;; this is an odd one. function call or multiplication? I choose the former
   (test "6E(1+2)" '(E 6 (+ 1 2))))
