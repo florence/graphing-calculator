@@ -90,8 +90,6 @@
 (define (make-renderer! parent)
   (define paste (new (class pasteboard%
                        (super-new)
-                       (define/augment (can-interactive-move? e) #f)
-                       (define/augment (can-interactive-resize? e) #f)
                        (define/augment (can-select? n ?) #f))))
   (define canvas (new editor-canvas%
                       [parent parent]
