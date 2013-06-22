@@ -22,11 +22,7 @@
                    '(define e   #i2.718281828459045)
                    '(define pi  #i3.14159)
                    '(define phi #i1.61803398875)
-                   '(define g   #i9.81)
-                   ;; the - prevents the input from calling it
-                   ;; -guard helps when graphing functions that approach inifinity,
-                   ;; in graph modes that expect only reals
-                   '(define (-guard v) (if (real? v) v +nan.0))))
+                   '(define g   #i9.81)))
 
 (define ((grapher builder normal inverse) min max invert? . str)
   (define exprs (map parse-string str))
@@ -35,14 +31,14 @@
                min max #:label (~a str #:separator ","))
               (axes))))
 
-(define graph2d (grapher (λ (e) `(λ (x) (-guard ,e))) function inverse))
+(define graph2d (grapher (λ (e) `(λ (x) ,e)) function inverse))
 
 (define (iparametric f)
   (parametric (λ (t) (reverse (f t)))))
 (define parametric2d 
-  (grapher (λ (e1 e2) `(λ (t) (list (-guard ,e1) (-guard ,e2))))
+  (grapher (λ (e1 e2) `(λ (t) (list ,e1 ,e2)))
            parametric
            iparametric))
 
-(define polar2d (grapher (λ (e) `(λ (t) (-guard ,e))) polar polar)) 
+(define polar2d (grapher (λ (e) `(λ (t) ,e)) polar polar)) 
   
