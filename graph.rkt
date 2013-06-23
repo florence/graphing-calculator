@@ -28,7 +28,7 @@
   (define exprs (map parse-string str))
   (plot (list ((if invert? inverse normal)
                (evaluate (apply builder exprs))
-               min max #:label (~a (keyword-apply ~a #:separator "," null null str)))
+               min max #:label (~a "[" (keyword-apply ~a #:separator "," null null str) "]"))
               (axes))))
 
 (define graph2d (grapher (λ (e) `(λ (x) ,e)) function inverse))
